@@ -11,6 +11,9 @@ export default function Routes() {
         <Route path="/detail/:characterId">
           <Detail />
         </Route>
+        <Route path="/:startsWith">
+          <Home />
+        </Route>
         <Route path="/">
           <Home />
         </Route>
