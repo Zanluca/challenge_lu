@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import styled from 'styled-components'
 import { useHistory, useParams, Link } from 'react-router-dom'
 
@@ -18,6 +18,8 @@ import Container from '../components/Container'
 import Footer from '../components/Footer'
 
 import Characters from '../service/characters'
+
+import CharacterContext from '../context/character'
 
 const Header = styled.header`
   text-align: center;
@@ -101,6 +103,12 @@ const ListCharacters = styled.ul`
     justify-content: space-between;
     max-width: 250px;
   }
+
+  div button {
+    background-color: transparent;
+    border: none;
+  }
+
   a:hover,
   a:visited,
   a:link,
@@ -119,6 +127,8 @@ export default function Home() {
   const debounceSearchTerm = useDebounce(startsWith, 500)
   const [searchName, setSearchName] = useState(startsWith)
   const [isOrderByName, setIsOrderByName] = useState(false)
+
+  const { handleFavoriteClick, isFavorite } = useContext(CharacterContext)
 
   const getData = async () => {
     const paylod = {
@@ -179,11 +189,23 @@ export default function Home() {
                   src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
                   alt=""
                 />
-                <div>
-                  {character.name}
-                  <img src={favoriteEmpty} alt="logo" />
-                </div>
               </Link>
+              <div>
+                {character.name}
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleFavoriteClick(character.id)
+                  }}
+                >
+                  <img
+                    src={
+                      isFavorite(character.id) ? favoriteFull : favoriteEmpty
+                    }
+                    alt="logo"
+                  />
+                </button>
+              </div>
             </li>
           ))}
         </ListCharacters>

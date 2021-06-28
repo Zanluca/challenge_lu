@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import styled from 'styled-components'
 
 import logo from '../assets/logo_menor.svg'
+import favoriteFull from '../assets/favorito_01.svg'
 import favoriteEmpty from '../assets/favorito_02.svg'
 import comicIcon from '../assets/ic_quadrinhos.svg'
 import rtingOff from '../assets/avaliacao_off.svg'
@@ -14,6 +15,8 @@ import SearchInput from '../components/SearchInput'
 import Footer from '../components/Footer'
 
 import Characters from '../service/characters'
+
+import CharacterContext from '../context/character'
 
 const Header = styled.header`
   display: flex;
@@ -85,6 +88,11 @@ const Details = styled.div`
     color: #8c8c8c;
     font-weight: 500;
   }
+
+  button {
+    background-color: transparent;
+    border: none;
+  }
 `
 
 const IconWithDescription = styled.span`
@@ -154,6 +162,8 @@ export default function Detail() {
   const [character, setCharacter] = useState(null)
   const [comics, setComics] = useState([])
 
+  const { handleFavoriteClick, isFavorite } = useContext(CharacterContext)
+
   useEffect(() => {
     const getData = async () => {
       if (characterId > 0) {
@@ -182,7 +192,19 @@ export default function Detail() {
               <Details>
                 <Title>
                   {character.name}
-                  <img src={favoriteEmpty} alt="logo" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFavoriteClick(character.id)
+                    }}
+                  >
+                    <img
+                      src={
+                        isFavorite(character.id) ? favoriteFull : favoriteEmpty
+                      }
+                      alt="logo"
+                    />
+                  </button>
                 </Title>
                 <p>{character.description}</p>
                 <ContainerInline>
