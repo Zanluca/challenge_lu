@@ -14,6 +14,8 @@ import { IMAGE_VARIANT } from '../utils/Const'
 import useDebounce from '../hooks/use-debounce'
 
 import SearchInput from '../components/SearchInput'
+import Container from '../components/Container'
+import Footer from '../components/Footer'
 
 import Characters from '../service/characters'
 
@@ -28,10 +30,6 @@ const Header = styled.header`
   p {
     color: #8c8c8c;
   }
-`
-
-const Container = styled.div`
-  text-align: center;
 `
 
 const InfoContainer = styled.div`
@@ -114,13 +112,6 @@ const ListCharacters = styled.ul`
   }
 `
 
-const Footer = styled.footer`
-  width: 100%;
-  height: 50px;
-  background-color: red;
-  margin-top: 100px;
-`
-
 export default function Home() {
   const [data, setData] = useState([])
   const history = useHistory()
@@ -185,7 +176,7 @@ export default function Home() {
             <li key={character.id}>
               <Link to={`detail/${character.id}`}>
                 <img
-                  src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_xlarge}.${character.thumbnail.extension}`}
+                  src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
                   alt=""
                 />
                 <div>

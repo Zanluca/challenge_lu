@@ -3,42 +3,46 @@ import styled from 'styled-components'
 import PropTypes from 'prop-types'
 
 import icon from '../assets/ic_busca.svg'
+import iconSmall from '../assets/ic_busca_menor.svg'
 
 const Container = styled.div`
   position: relative;
+  width: 50%;
   img {
     position: absolute;
     top: 6px;
     padding: 15px 30px;
   }
   input[type='text'] {
-    width: 50%;
-    border: 2px solid #aaa;
+    width: 100%;
     border-radius: 4px;
     margin: 8px 0;
     outline: none;
-    padding: 18px;
+    padding: ${(props) => (props.size === 'normal' ? '18px' : '15px')};
     box-sizing: border-box;
     transition: 0.3s;
     border-radius: 50px;
-    border: 1px solid #fdecec;
-    background-color: #fdecec;
-    padding-left: 90px;
+    border: ${(props) =>
+      props.size === 'normal' ? '1px solid #fdecec' : '1px solid #FFF'};
+    background-color: ${(props) =>
+      props.size === 'normal' ? '#fdecec' : '#fFF'};
+    padding-left: ${(props) => (props.size === 'normal' ? '90px' : '70px')};
   }
   input[type='text']:focus {
     outline: none;
-    border: 2px solid #f00;
+    border: ${(props) =>
+      props.size === 'normal' ? '2px solid #f00' : '1px solid #000'};
   }
   input[type='text']::-webkit-input-placeholder {
-    color: #fa8484;
+    color: ${(props) => (props.size === 'normal' ? '#fa8484' : '##8c8c8c')};
     font-weight: bold;
   }
 `
 
-export default function SearchInput({ value, onChange }) {
+export default function SearchInput({ value, onChange, size }) {
   return (
-    <Container>
-      <img src={icon} alt="icon" />
+    <Container size={size}>
+      <img src={size === 'normal' ? icon : iconSmall} alt="icon" />
       <input
         value={value}
         type="text"
@@ -51,10 +55,12 @@ export default function SearchInput({ value, onChange }) {
 
 SearchInput.propTypes = {
   value: PropTypes.string,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  size: PropTypes.oneOf(['small', 'normal'])
 }
 
 SearchInput.defaultProps = {
   value: '',
-  onChange: () => {}
+  onChange: () => {},
+  size: 'normal'
 }
