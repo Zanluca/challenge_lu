@@ -1,6 +1,10 @@
 const IMAGE_VARIANT = {
   portrait: {
-    portrait_small: 'portrait_small'
+    portrait_small: 'portrait_small',
+    portrait_medium: 'portrait_medium',
+    portrait_xlarge: 'portrait_xlarge',
+    portrait_uncanny: 'portrait_uncanny',
+    portrait_incredible: 'portrait_incredible'
   },
   standard: {
     standard_small: 'standard_small',
