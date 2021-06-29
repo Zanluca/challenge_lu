@@ -22,7 +22,7 @@ jobs:
     steps:
      # Get code from repo
       - name: Checkout code
-      - uses: actions/checkout@v2
+        uses: actions/checkout@v2
       
       # Install NodeJS
       - name: Use Node.js 16.x
