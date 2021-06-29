@@ -1,18 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useHistory, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import logo from '../assets/logo_menor.svg'
-import favoriteFull from '../assets/favorito_01.svg'
-import favoriteEmpty from '../assets/favorito_02.svg'
 import comicIcon from '../assets/ic_quadrinhos.svg'
-import rtingOff from '../assets/avaliacao_off.svg'
+import movieIcon from '../assets/ic_trailer.svg'
 
 import { IMAGE_VARIANT } from '../utils/Const'
 
 import Container from '../components/Container'
 import SearchInput from '../components/SearchInput'
 import Footer from '../components/Footer'
+import ButtonFavorite from '../components/ButtonFavorite'
+import Rating from '../components/Rating'
 
 import Characters from '../service/characters'
 
@@ -20,14 +20,12 @@ import CharacterContext from '../context/character'
 
 const Header = styled.header`
   display: flex;
-  width: 100%;
+  width: 85%;
+  margin-top: 40px;
+  align-items: center;
 
   div {
-    margin-left: 30px;
-  }
-
-  .logo {
-    padding-left: 10%;
+    margin-left: 40px;
   }
 `
 
@@ -55,7 +53,7 @@ const Background = styled.div`
 
   div {
     font-size: 13em;
-    padding-top: 50px;
+    padding-top: 150px;
     padding-left: 50px;
     padding-right: 50px;
     font-weight: bold;
@@ -81,7 +79,7 @@ const Title = styled.div`
 `
 
 const Details = styled.div`
-  width: 40%;
+  width: 30%;
 
   p {
     text-align: justify;
@@ -161,6 +159,11 @@ export default function Detail() {
   const { characterId } = useParams()
   const [character, setCharacter] = useState(null)
   const [comics, setComics] = useState([])
+  const [inputText, setInputText] = useState('')
+  const [lastComic, setLastComic] = useState(null)
+  const [rating, setRating] = useState(0)
+
+  const history = useHistory()
 
   const { handleFavoriteClick, isFavorite } = useContext(CharacterContext)
 
@@ -171,7 +174,18 @@ export default function Detail() {
         setCharacter(characterInfo[0])
         const comicResponse = await Characters.getComicByCharacter(characterId)
         setComics(comicResponse)
+        const lastDate = comicResponse[0].dates[0].date
+        const date = new Date(lastDate)
+        const options = {
+          year: 'numeric',
+          month: 'short',
+          day: '2-digit'
+        }
+        setLastComic(
+          date.toLocaleDateString('pt-BR', options).replace(/de\s/gi, ' ')
+        )
       }
+      setRating(Math.random() * 6)
     }
     getData()
   }, [])
@@ -179,8 +193,22 @@ export default function Detail() {
   return (
     <Container>
       <Header>
-        <img src={logo} alt="logo" className="logo" />
-        <SearchInput size="small" />
+        <Link className="logo" to="/">
+          <img src={logo} alt="logo" />
+        </Link>
+        <SearchInput
+          size="small"
+          value={inputText}
+          onChange={(text) => {
+            setInputText(text)
+          }}
+          onKeyDown={(evt) => {
+            if (evt.keyCode === 13 && evt.shiftKey === false) {
+              evt.preventDefault()
+              history.push(`/${inputText}`)
+            }
+          }}
+        />
       </Header>
       {character && (
         <>
@@ -192,53 +220,39 @@ export default function Detail() {
               <Details>
                 <Title>
                   {character.name}
-                  <button
-                    type="button"
+                  <ButtonFavorite
                     onClick={() => {
                       handleFavoriteClick(character.id)
                     }}
-                  >
-                    <img
-                      src={
-                        isFavorite(character.id) ? favoriteFull : favoriteEmpty
-                      }
-                      alt="logo"
-                    />
-                  </button>
+                    isFavorite={isFavorite(character.id)}
+                  />
                 </Title>
                 <p>{character.description}</p>
                 <ContainerInline>
                   <div>
                     <p>Quadrinhos</p>
                     <IconWithDescription>
-                      <img src={comicIcon} alt="quadrinho" />
+                      <img src={comicIcon} alt="ícone quadrinho" />
                       {character.comics.available}
                     </IconWithDescription>
                   </div>
                   <div>
                     <p>Filmes</p>
                     <IconWithDescription>
-                      <img src={comicIcon} alt="quadrinho" />
+                      <img src={movieIcon} alt="ícone filmes" />
                       {character.series.available}
                     </IconWithDescription>
                   </div>
                 </ContainerInline>
-                <LabelWithInfo>
-                  <p>Rating:</p>
-                  <img src={rtingOff} alt="quadrinho" />
-                  <img src={rtingOff} alt="quadrinho" />
-                  <img src={rtingOff} alt="quadrinho" />
-                  <img src={rtingOff} alt="quadrinho" />
-                  <img src={rtingOff} alt="quadrinho" />
-                </LabelWithInfo>
+                <Rating numberOfStars={rating} />
                 <LabelWithInfo>
                   <p>Último quadrinho:</p>
-                  13 fev. 2020
+                  {lastComic}
                 </LabelWithInfo>
               </Details>
               <img
                 src={`${character.thumbnail.path}/${IMAGE_VARIANT.portrait.portrait_uncanny}.${character.thumbnail.extension}`}
-                alt=""
+                alt="foto do personagem"
               />
             </InfoCharacter>
             <ContainerComic>
@@ -248,7 +262,7 @@ export default function Detail() {
                   <li key={comic.id}>
                     <img
                       src={`${comic.thumbnail.path}/${IMAGE_VARIANT.portrait.portrait_xlarge}.${character.thumbnail.extension}`}
-                      alt={comic.title}
+                      alt={`capa do quadrinho ${comic.title}`}
                     />
                     <span>{comic.title}</span>
                   </li>

@@ -11,7 +11,6 @@ export const CharacterProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([])
 
   const handleFavoriteClick = (characterID) => {
-    console.log(characterID)
     if (favorites.find((fav) => fav === characterID)) {
       const newFavorites = favorites.filter((fav) => fav !== characterID)
       setFavorites(newFavorites)
