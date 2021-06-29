@@ -5,7 +5,6 @@ import { useHistory, useParams, Link } from 'react-router-dom'
 import logo from '../assets/logo.svg'
 import hero from '../assets/ic_heroi.svg'
 import favoriteFull from '../assets/favorito_01.svg'
-import favoriteEmpty from '../assets/favorito_02.svg'
 import toggleOff from '../assets/toggle_off.svg'
 import toggleOn from '../assets/toggle_on.svg'
 
@@ -16,6 +15,7 @@ import useDebounce from '../hooks/use-debounce'
 import SearchInput from '../components/SearchInput'
 import Container from '../components/Container'
 import Footer from '../components/Footer'
+import ButtonFavorite from '../components/ButtonFavorite'
 
 import Characters from '../service/characters'
 
@@ -169,7 +169,7 @@ export default function Home() {
                 setIsOrderByName(!isOrderByName)
               }}
             >
-              <img src={hero} alt="logo" />
+              <img src={hero} alt="ícone de herói" />
               Ordernar por nome - A/Z
               <img
                 src={isOrderByName ? toggleOn : toggleOff}
@@ -177,7 +177,8 @@ export default function Home() {
               />
             </Button>
             <Button>
-              <img src={favoriteFull} alt="logo" /> Somentente favoritos
+              <img src={favoriteFull} alt="ícone de coração" /> Somentente
+              favoritos
             </Button>
           </FiltersContainer>
         </InfoContainer>
@@ -187,24 +188,17 @@ export default function Home() {
               <Link to={`detail/${character.id}`}>
                 <img
                   src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
-                  alt=""
+                  alt="foto do personagem"
                 />
               </Link>
               <div>
                 {character.name}
-                <button
-                  type="button"
+                <ButtonFavorite
                   onClick={() => {
                     handleFavoriteClick(character.id)
                   }}
-                >
-                  <img
-                    src={
-                      isFavorite(character.id) ? favoriteFull : favoriteEmpty
-                    }
-                    alt="logo"
-                  />
-                </button>
+                  isFavorite={isFavorite(character.id)}
+                />
               </div>
             </li>
           ))}

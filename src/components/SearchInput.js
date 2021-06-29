@@ -39,7 +39,7 @@ const Container = styled.div`
   }
 `
 
-export default function SearchInput({ value, onChange, size }) {
+export default function SearchInput({ value, onChange, size, onKeyDown }) {
   return (
     <Container size={size}>
       <img src={size === 'normal' ? icon : iconSmall} alt="icon" />
@@ -48,6 +48,7 @@ export default function SearchInput({ value, onChange, size }) {
         type="text"
         placeholder="Procure por heróis"
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={onKeyDown}
       />
     </Container>
   )
@@ -56,11 +57,13 @@ export default function SearchInput({ value, onChange, size }) {
 SearchInput.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
-  size: PropTypes.oneOf(['small', 'normal'])
+  size: PropTypes.oneOf(['small', 'normal']),
+  onKeyDown: PropTypes.func
 }
 
 SearchInput.defaultProps = {
   value: '',
   onChange: () => {},
-  size: 'normal'
+  size: 'normal',
+  onKeyDown: () => {}
 }
