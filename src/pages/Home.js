@@ -123,12 +123,15 @@ const ListCharacters = styled.ul`
 export default function Home() {
   const [data, setData] = useState([])
   const history = useHistory()
+  const [isOrderByName, setIsOrderByName] = useState(false)
+  const [onlyFavorites, setOnlyFavorites] = useState(false)
+
   const { startsWith } = useParams()
   const debounceSearchTerm = useDebounce(startsWith, 500)
   const [searchName, setSearchName] = useState(startsWith)
-  const [isOrderByName, setIsOrderByName] = useState(false)
 
-  const { handleFavoriteClick, isFavorite } = useContext(CharacterContext)
+  const { handleFavoriteClick, isFavorite, favorites } =
+    useContext(CharacterContext)
 
   const getData = async () => {
     const paylod = {
@@ -137,11 +140,23 @@ export default function Home() {
     }
     const character = await Characters.getCharacters(paylod)
     setData(character)
+    setOnlyFavorites(false)
   }
 
   useEffect(() => {
     getData()
   }, [debounceSearchTerm, isOrderByName])
+
+  const handleOnlyFavoriteClick = async () => {
+    if (!onlyFavorites) {
+      const requests = favorites.map((favorite) =>
+        Characters.getCharacterById(favorite)
+      )
+      const characters = await Promise.all(requests)
+      setData([...characters])
+      setOnlyFavorites(true)
+    } else getData()
+  }
 
   return (
     <Container>
@@ -176,7 +191,7 @@ export default function Home() {
                 alt={isOrderByName ? 'togle on' : 'toggle off'}
               />
             </Button>
-            <Button>
+            <Button onClick={handleOnlyFavoriteClick}>
               <img src={favoriteFull} alt="ícone de coração" /> Somentente
               favoritos
             </Button>

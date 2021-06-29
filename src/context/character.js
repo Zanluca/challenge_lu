@@ -16,6 +16,7 @@ export const CharacterProvider = ({ children }) => {
       setFavorites(newFavorites)
     } else {
       if (favorites.length === 5) {
+        // eslint-disable-next-line
         alert('Você já tem 5 personagens favoritos')
         return
       }
@@ -24,7 +25,7 @@ export const CharacterProvider = ({ children }) => {
   }
 
   const isFavorite = (characterId) =>
-    favorites?.find((fav) => fav === characterId)
+    !!favorites?.find((fav) => fav === characterId)
 
   const value = { favorites, setFavorites, handleFavoriteClick, isFavorite }
 

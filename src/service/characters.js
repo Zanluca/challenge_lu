@@ -36,7 +36,7 @@ const Characters = {
       `${process.env.REACT_APP_BASE_URL}/v1/public/characters/${characterId}?ts=${timeStamp}&apikey=${process.env.REACT_APP_PUBLIC_KEY}&hash=${hash}`
     )
     const json = await response.json()
-    return json.data.results
+    return json.data.results[0]
   },
   getComicByCharacter: async (characterId) => {
     const timeStamp = new Date().getTime()

@@ -171,7 +171,7 @@ export default function Detail() {
     const getData = async () => {
       if (characterId > 0) {
         const characterInfo = await Characters.getCharacterById(characterId)
-        setCharacter(characterInfo[0])
+        setCharacter(characterInfo)
         const comicResponse = await Characters.getComicByCharacter(characterId)
         setComics(comicResponse)
         const lastDate = comicResponse[0].dates[0].date
