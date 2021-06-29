@@ -15,6 +15,10 @@ const IMAGE_VARIANT = {
   }
 }
 
-const test = ''
+const STATUS = {
+  loading: 0,
+  error: 1,
+  success: 2
+}
 
-export { IMAGE_VARIANT, test }
+export { IMAGE_VARIANT, STATUS }

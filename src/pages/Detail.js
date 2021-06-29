@@ -6,7 +6,7 @@ import logo from '../assets/logo_menor.svg'
 import comicIcon from '../assets/ic_quadrinhos.svg'
 import movieIcon from '../assets/ic_trailer.svg'
 
-import { IMAGE_VARIANT } from '../utils/Const'
+import { IMAGE_VARIANT, STATUS } from '../utils/Const'
 
 import Container from '../components/Container'
 import SearchInput from '../components/SearchInput'
@@ -17,6 +17,7 @@ import Rating from '../components/Rating'
 import Characters from '../service/characters'
 
 import CharacterContext from '../context/character'
+import StatusMessage from '../components/StatusMessage'
 
 const Header = styled.header`
   display: flex;
@@ -162,6 +163,7 @@ export default function Detail() {
   const [inputText, setInputText] = useState('')
   const [lastComic, setLastComic] = useState(null)
   const [rating, setRating] = useState(0)
+  const [status, setStatus] = useState(STATUS.loading)
 
   const history = useHistory()
 
@@ -169,8 +171,13 @@ export default function Detail() {
 
   useEffect(() => {
     const getData = async () => {
+      setStatus(STATUS.loading)
       if (characterId > 0) {
         const characterInfo = await Characters.getCharacterById(characterId)
+        if (characterInfo === STATUS.error) {
+          setStatus(STATUS.error)
+          return
+        }
         setCharacter(characterInfo)
         const comicResponse = await Characters.getComicByCharacter(characterId)
         setComics(comicResponse)
@@ -186,6 +193,7 @@ export default function Detail() {
         )
       }
       setRating(Math.random() * 6)
+      setStatus(STATUS.success)
     }
     getData()
   }, [])
@@ -210,11 +218,12 @@ export default function Detail() {
           }}
         />
       </Header>
-      {character && (
+      <Background>
+        <div>{character?.name}</div>
+      </Background>
+      {status !== STATUS.success && <StatusMessage status={status} />}
+      {character && status === STATUS.success && (
         <>
-          <Background>
-            <div>{character.name}</div>
-          </Background>
           <Main>
             <InfoCharacter>
               <Details>
