@@ -8,7 +8,7 @@ import favoriteFull from '../assets/favorito_01.svg'
 import toggleOff from '../assets/toggle_off.svg'
 import toggleOn from '../assets/toggle_on.svg'
 
-import { IMAGE_VARIANT } from '../utils/Const'
+import { IMAGE_VARIANT, STATUS } from '../utils/Const'
 
 import useDebounce from '../hooks/use-debounce'
 
@@ -16,6 +16,7 @@ import SearchInput from '../components/SearchInput'
 import Container from '../components/Container'
 import Footer from '../components/Footer'
 import ButtonFavorite from '../components/ButtonFavorite'
+import StatusMessage from '../components/StatusMessage'
 
 import Characters from '../service/characters'
 
@@ -56,7 +57,6 @@ const Main = styled.main`
 
 const FiltersContainer = styled.div`
   justify-content: space-between;
-  /* background-color: green; */
   width: 45%;
   display: flex;
   align-items: center;
@@ -123,8 +123,9 @@ const ListCharacters = styled.ul`
 export default function Home() {
   const [data, setData] = useState([])
   const history = useHistory()
-  const [isOrderByName, setIsOrderByName] = useState(false)
+  const [isOrderByName, setIsOrderByName] = useState(true)
   const [onlyFavorites, setOnlyFavorites] = useState(false)
+  const [status, setStatus] = useState(STATUS.loading)
 
   const { startsWith } = useParams()
   const debounceSearchTerm = useDebounce(startsWith, 500)
@@ -134,27 +135,41 @@ export default function Home() {
     useContext(CharacterContext)
 
   const getData = async () => {
+    setStatus(STATUS.loading)
     const paylod = {
       nameStartsWith: debounceSearchTerm,
       orderByName: isOrderByName
     }
     const character = await Characters.getCharacters(paylod)
+    if (character === STATUS.error) {
+      setStatus(STATUS.error)
+      return
+    }
+
     setData(character)
     setOnlyFavorites(false)
+    setStatus(STATUS.success)
   }
 
   useEffect(() => {
-    getData()
+    if (!onlyFavorites) getData()
   }, [debounceSearchTerm, isOrderByName])
 
   const handleOnlyFavoriteClick = async () => {
+    setStatus(STATUS.loading)
     if (!onlyFavorites) {
+      setOnlyFavorites(true)
       const requests = favorites.map((favorite) =>
         Characters.getCharacterById(favorite)
       )
       const characters = await Promise.all(requests)
-      setData([...characters])
-      setOnlyFavorites(true)
+      const removeError = characters.filter(
+        (character) => character !== STATUS.error
+      )
+      setData(removeError)
+      setSearchName('')
+      history.push(`/`)
+      setStatus(STATUS.success)
     } else getData()
   }
 
@@ -171,55 +186,64 @@ export default function Home() {
       <SearchInput
         value={searchName}
         onChange={(text) => {
+          setOnlyFavorites(false)
           setSearchName(text)
           history.push(`/${text}`)
         }}
       />
-      <Main>
-        <InfoContainer>
-          <span>{`Econtrados ${data.length} heróis`}</span>
-          <FiltersContainer>
-            <Button
-              onClick={() => {
-                setIsOrderByName(!isOrderByName)
-              }}
-            >
-              <img src={hero} alt="ícone de herói" />
-              Ordernar por nome - A/Z
-              <img
-                src={isOrderByName ? toggleOn : toggleOff}
-                alt={isOrderByName ? 'togle on' : 'toggle off'}
-              />
-            </Button>
-            <Button onClick={handleOnlyFavoriteClick}>
-              <img src={favoriteFull} alt="ícone de coração" /> Somentente
-              favoritos
-            </Button>
-          </FiltersContainer>
-        </InfoContainer>
-        <ListCharacters>
-          {data.map((character) => (
-            <li key={character.id}>
-              <Link to={`detail/${character.id}`}>
+      {status !== STATUS.success && <StatusMessage status={status} />}
+      {status === STATUS.success && (
+        <Main>
+          <InfoContainer>
+            <span>{`Econtrados ${data.length} heróis`}</span>
+            <FiltersContainer>
+              <Button
+                onClick={() => {
+                  setIsOrderByName(!isOrderByName)
+                }}
+              >
+                <img src={hero} alt="ícone de herói" />
+                {`Ordernar por nome - ${isOrderByName ? 'Z/A' : 'A/Z'}`}
                 <img
-                  src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
-                  alt="foto do personagem"
+                  src={isOrderByName ? toggleOn : toggleOff}
+                  alt={isOrderByName ? 'togle on' : 'toggle off'}
                 />
-              </Link>
-              <div>
-                {character.name}
-                <ButtonFavorite
-                  onClick={() => {
-                    handleFavoriteClick(character.id)
-                  }}
-                  isFavorite={isFavorite(character.id)}
-                />
-              </div>
-            </li>
-          ))}
-        </ListCharacters>
-        <Footer />
-      </Main>
+              </Button>
+              <Button onClick={handleOnlyFavoriteClick}>
+                <img src={favoriteFull} alt="ícone de coração" /> Somentente
+                favoritos
+              </Button>
+            </FiltersContainer>
+          </InfoContainer>
+          {data && data.length === 0 && (
+            <span>Nenhum resultado encontrado...</span>
+          )}
+          {data && data.length > 0 && (
+            <ListCharacters>
+              {data.map((character) => (
+                <li key={character.id}>
+                  <Link to={`detail/${character.id}`}>
+                    <img
+                      src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
+                      alt="foto do personagem"
+                    />
+                  </Link>
+                  <div>
+                    {character.name}
+                    <ButtonFavorite
+                      onClick={() => {
+                        handleFavoriteClick(character.id)
+                      }}
+                      isFavorite={isFavorite(character.id)}
+                    />
+                  </div>
+                </li>
+              ))}
+            </ListCharacters>
+          )}
+          <Footer />
+        </Main>
+      )}
     </Container>
   )
 }
