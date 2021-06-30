@@ -9,6 +9,7 @@ Link para ver a aplicação rodando: [aqui](https://lucid-spence-23b57c.netlify.
 ## Rodando aplicação localmente
 
 Crie um arquivo `.env.local` seguindo o padrão do arquivo `.env`. Para criar a chaves necessárias acesse esse [link](https://developer.marvel.com/account) e para mais informações da API [aqui](https://developer.marvel.com/docs)
+
 Dentro da pasta raiz rode:
 ```sh
 npm install
