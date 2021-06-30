@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react'
+import React, { useState, createContext, useEffect } from 'react'
 
 import PropTypes from 'prop-types'
 
@@ -10,10 +10,19 @@ const CharacterContext = createContext({
 export const CharacterProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([])
 
+  useEffect(() => {
+    const storage = localStorage.getItem('favorites')
+    if (storage && Array.isArray(storage)) {
+      const favoritesStorage = JSON.parse(storage).slice(0, 5)
+      setFavorites(favoritesStorage)
+    }
+  }, [])
+
   const handleFavoriteClick = (characterID) => {
     if (favorites.find((fav) => fav === characterID)) {
       const newFavorites = favorites.filter((fav) => fav !== characterID)
       setFavorites(newFavorites)
+      localStorage.setItem('favorites', JSON.stringify(newFavorites))
     } else {
       if (favorites.length === 5) {
         // eslint-disable-next-line
@@ -21,6 +30,10 @@ export const CharacterProvider = ({ children }) => {
         return
       }
       setFavorites([...favorites, characterID])
+      localStorage.setItem(
+        'favorites',
+        JSON.stringify([...favorites, characterID])
+      )
     }
   }
 
