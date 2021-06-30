@@ -13,7 +13,7 @@ export default function StatusMessage({ status }) {
 }
 
 StatusMessage.propTypes = {
-  status: PropTypes.oneOf([STATUS.loading, STATUS.loading])
+  status: PropTypes.oneOf([STATUS.loading, STATUS.error])
 }
 
 StatusMessage.defaultProps = {

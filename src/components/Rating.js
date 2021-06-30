@@ -26,7 +26,7 @@ export default function Rating({ numberOfStars }) {
           key={index}
           src={index >= numberOfStars ? ratingOff : ratingOn}
           alt={`ícone de estrela ${
-            index >= numberOfStars ? 'preenchido' : 'vazio'
+            index >= numberOfStars ? 'vazio' : 'preenchido'
           }`}
         />
       ))}
