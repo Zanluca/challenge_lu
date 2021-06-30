@@ -8,7 +8,7 @@ import favoriteFull from '../assets/favorito_01.svg'
 import toggleOff from '../assets/toggle_off.svg'
 import toggleOn from '../assets/toggle_on.svg'
 
-import { IMAGE_VARIANT, STATUS } from '../utils/Const'
+import { IMAGE_VARIANT, STATUS, NUMBER_BY_PAGE } from '../utils/Const'
 
 import useDebounce from '../hooks/use-debounce'
 
@@ -17,6 +17,7 @@ import Container from '../components/Container'
 import Footer from '../components/Footer'
 import ButtonFavorite from '../components/ButtonFavorite'
 import StatusMessage from '../components/StatusMessage'
+import PaginationButton from '../components/PaginationButton'
 
 import Characters from '../service/characters'
 
@@ -126,6 +127,7 @@ export default function Home() {
   const [isOrderByName, setIsOrderByName] = useState(true)
   const [onlyFavorites, setOnlyFavorites] = useState(false)
   const [status, setStatus] = useState(STATUS.loading)
+  const [page, setPage] = useState(1)
 
   const { startsWith } = useParams()
   const debounceSearchTerm = useDebounce(startsWith, 500)
@@ -134,11 +136,12 @@ export default function Home() {
   const { handleFavoriteClick, isFavorite, favorites } =
     useContext(CharacterContext)
 
-  const getData = async () => {
+  const getData = async (pageActual = 1) => {
     setStatus(STATUS.loading)
     const paylod = {
       nameStartsWith: debounceSearchTerm,
-      orderByName: isOrderByName
+      orderByName: isOrderByName,
+      offset: NUMBER_BY_PAGE * pageActual - NUMBER_BY_PAGE
     }
     const character = await Characters.getCharacters(paylod)
     if (character === STATUS.error) {
@@ -149,10 +152,11 @@ export default function Home() {
     setData(character)
     setOnlyFavorites(false)
     setStatus(STATUS.success)
+    setPage(pageActual)
   }
 
   useEffect(() => {
-    if (!onlyFavorites) getData()
+    if (!onlyFavorites) getData(1)
   }, [debounceSearchTerm, isOrderByName])
 
   const handleOnlyFavoriteClick = async () => {
@@ -169,6 +173,7 @@ export default function Home() {
       setData(removeError)
       setSearchName('')
       history.push(`/`)
+      setPage(1)
       setStatus(STATUS.success)
     } else getData()
   }
@@ -219,27 +224,42 @@ export default function Home() {
             <span>Nenhum resultado encontrado...</span>
           )}
           {data && data.length > 0 && (
-            <ListCharacters>
-              {data.map((character) => (
-                <li key={character.id}>
-                  <Link to={`detail/${character.id}`}>
-                    <img
-                      src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
-                      alt="foto do personagem"
-                    />
-                  </Link>
-                  <div>
-                    {character.name}
-                    <ButtonFavorite
-                      onClick={() => {
-                        handleFavoriteClick(character.id)
-                      }}
-                      isFavorite={isFavorite(character.id)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ListCharacters>
+            <>
+              <ListCharacters>
+                {data.map((character) => (
+                  <li key={character.id}>
+                    <Link to={`detail/${character.id}`}>
+                      <img
+                        src={`${character.thumbnail.path}/${IMAGE_VARIANT.standard.standard_fantastic}.${character.thumbnail.extension}`}
+                        alt="foto do personagem"
+                      />
+                    </Link>
+                    <div>
+                      {character.name}
+                      <ButtonFavorite
+                        onClick={() => {
+                          handleFavoriteClick(character.id)
+                        }}
+                        isFavorite={isFavorite(character.id)}
+                      />
+                    </div>
+                  </li>
+                ))}
+              </ListCharacters>
+            </>
+          )}
+          {!onlyFavorites && (
+            <PaginationButton
+              page={page}
+              prevClick={() => {
+                if (page - 1 >= 1) {
+                  getData(page - 1)
+                }
+              }}
+              nextClick={() => {
+                getData(page + 1)
+              }}
+            />
           )}
           <Footer />
         </Main>
