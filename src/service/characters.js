@@ -7,7 +7,7 @@ const Characters = {
     limit = NUMBER_BY_PAGE,
     nameStartsWith = '',
     offset = 0,
-    orderByName = false
+    orderByNameAsc = true
   } = {}) => {
     try {
       const timeStamp = new Date().getTime()
@@ -25,7 +25,7 @@ const Characters = {
         }&limit=${limit}&apikey=${
           process.env.REACT_APP_PUBLIC_KEY
         }&hash=${hash}&offset=${offset}&orderBy=${
-          orderByName ? 'name' : '-name'
+          orderByNameAsc ? 'name' : '-name'
         }`
       )
 

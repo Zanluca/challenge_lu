@@ -12,9 +12,12 @@ export const CharacterProvider = ({ children }) => {
 
   useEffect(() => {
     const storage = localStorage.getItem('favorites')
-    if (storage && Array.isArray(storage)) {
-      const favoritesStorage = JSON.parse(storage).slice(0, 5)
-      setFavorites(favoritesStorage)
+    if (storage) {
+      const parse = JSON.parse(storage)
+      if (Array.isArray(parse)) {
+        const favoritesStorage = parse.slice(0, 5)
+        setFavorites(favoritesStorage)
+      }
     }
   }, [])
 
