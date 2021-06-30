@@ -21,4 +21,6 @@ const STATUS = {
   success: 2
 }
 
-export { IMAGE_VARIANT, STATUS }
+const NUMBER_BY_PAGE = 20
+
+export { IMAGE_VARIANT, STATUS, NUMBER_BY_PAGE }

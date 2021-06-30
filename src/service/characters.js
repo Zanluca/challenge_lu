@@ -1,10 +1,10 @@
 import md5 from 'md5'
 
-import { STATUS } from '../utils/Const'
+import { STATUS, NUMBER_BY_PAGE } from '../utils/Const'
 
 const Characters = {
   getCharacters: async ({
-    limit = 20,
+    limit = NUMBER_BY_PAGE,
     nameStartsWith = '',
     offset = 0,
     orderByName = false
